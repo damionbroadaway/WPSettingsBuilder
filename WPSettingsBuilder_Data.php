@@ -21,22 +21,62 @@ class WPSettingsBuilder_Data
 {
     public function __construct()
     {
-        return array();
+
     }
 
     public static function menu()
     {
-        return array();
+        return array(
+            array(
+                'page_title'    =>  '',
+                'menu_title'    =>  '',
+                'capability'    =>  '',
+                'function'      =>  array(
+                    '', //  Callback class.
+                    ''  //  Callback method.
+                ),
+                'icon_url'      =>  '',
+                'position'      =>  ''
+            ),
+            //  Copy above array to here add additional menu items.
+            //  Repeat as needed.
+        );
     }
 
     public static  function subMenu()
     {
-        return array();
+        return array(
+            array(
+                'parent_slug'   =>  '',
+                'page_title'    =>  '',
+                'menu_title'    =>  '',
+                'capability'    =>  '',
+                'menu_slug'     =>  '',
+                'function'      => array(
+                    '', //  Callback class
+                    ''  //  Callback method
+                )
+            ),
+            //  Copy above array to here to add additional submenu items.
+            //  Repeat as needed.
+        );
     }
 
-    public static  function section()
+    public static function section()
     {
-        return array();
+        return array(
+            array(
+                'id'        =>  '',
+                'title'     =>  '',
+                'callback'  =>  array(
+                    '', //  Callback class
+                    ''  //  Callback method
+                ),
+                'page'      =>  '',
+            ),
+            //  Copy above array to here to add additional sections.
+            //  Repeat as needed.
+        );
     }
 
     public static function fields()
@@ -54,6 +94,4 @@ class WPSettingsBuilder_Data
         return array();
     }
 
-
- 
 }

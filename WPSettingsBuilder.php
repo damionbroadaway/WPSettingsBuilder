@@ -28,54 +28,85 @@ class WPSettingsBuilder
 
     public function __construct()
     {
-        include_once 'WPSettingsBuilder_Data.php';
-        $this->_menuData = WPSettingsBuilder_Data::menu();
-        $this->_sectionData = WPSettingsBuilder_Data::section();
-        $this->_fieldData = WPSettingsBuilder_Data::fields();
-        $this->_cptData = WPSettingsBuilder_Data::customPostTypes();
-        $this->_taxData = WPSettingsBuilder_Data::taxonomy();
-        $this->_subMenuData = WPSettingsBuilder_Data::subMenu();
+        if (file_exists('WPSettingsBuilder_Data.php')) {
+            require_once 'WPSettingsBuilder_Data.php';
+        }
 
-        //include_once 'WPSettingsBuilder_SectionCallbacks.php';
-        //include_once 'WPSettingsBuilder_FieldCallbacks.php';
+        $this->_menuData    = WPSettingsBuilder_Data::menu();
+        $this->_subMenuData = WPSettingsBuilder_Data::subMenu();
+        $this->_sectionData = WPSettingsBuilder_Data::section();
+        $this->_fieldData   = WPSettingsBuilder_Data::fields();
+        $this->_cptData     = WPSettingsBuilder_Data::customPostTypes();
+        $this->_taxData     = WPSettingsBuilder_Data::taxonomy();
     }
 
+    /**
+     * A wrapper for WordPress's method of adding
+     *  menu items to the Dashboard menu
+     *
+     * Method expects the following well formatted array:
+     *
+     * array(
+     *      array(
+                'page_title'    =>  '',
+                'menu_title'    =>  '',
+                'capability'    =>  '',
+                'function'      =>  array(
+                    '',
+                    ''
+                ),
+                'icon_url'      =>  '',
+                'position'      =>  ''
+            ),
+     *      array(...
+     *      ),
+     *      array(...
+     *      ),
+     *      Add as many sub arrays as need for menu items.
+     * );
+     *
+     * @see     WPSettingsBuilder_Data.php for source data
+     * @link    http://codex.wordpress.org/Function_Reference/add_menu_page
+     *
+     */
     public function addAdminMenu()
     {
-        foreach ($this->_menuData as $value){
+        foreach ($this->_menuData as $menu_data){
             add_menu_page(
-                $value['pageTitle'],
-                $value['menuTitle'],
-                $value['cap'],
-                $value['menuSlug'],
-                $value['callBack'],
-                $value['icon'],
-                $value['position']
+                $menu_data['page_title'],
+                $menu_data['menu_title'],
+                $menu_data['capability'],
+                $menu_data['menu_slug'],
+                $menu_data['function'],
+                $menu_data['icon_url'],
+                $menu_data['position']
             );
         }
     }
 
     /**
      * A wrapper for WordPress's method of adding
-     *  sub items to the dashboard menu
+     *  submenu items to the Dashboard menu
      *
      * Method expects $args to be the following well formatted array:
      *
      * array(
      *      array(
-     *          'parentSlug'        => '',
-     *          'pageTitle'         => '',
-     *          'menuTitle'         => '',
-     *          'cap'               => '',
-     *          'menuSlug'          => '',
-     *          'callbackClass'     => '',
-     *          'callbackMethod'    => ''
+     *          'parent_slug'   =>  '',
+     *          'page_title'    =>  '',
+     *          'menu_title'    =>  '',
+     *          'capability'    =>  '',
+     *          'menu_slug'     =>  '',
+     *          'function'      => array(
+     *              '',
+     *              ''
+     *          )
      *      ),
      *      array(...
      *      ),
      *      array(...
      *      )
-     *      Add as many sub arrays as needed to represent all menu sub-items
+     *      Add as many sub arrays as needed to represent all submenu items
      * )
      *
      * @see   WPSettingsBuilder_Data.php for source data
@@ -83,17 +114,14 @@ class WPSettingsBuilder
      */
     public function addAdminSubMenu()
     {
-        foreach ($this->_subMenuData as $value) {
+        foreach ($this->_subMenuData as $sub_menu_data) {
             add_submenu_page(
-                $value['parentSlug'],
-                $value['pageTitle'],
-                $value['menuTitle'],
-                $value['cap'],
-                $value['menuSlug'],
-                array(
-                     $value['callbackClass'],
-                     $value['callbackMethod']
-                )
+                $sub_menu_data['parent_slug'],
+                $sub_menu_data['page_title'],
+                $sub_menu_data['menu_title'],
+                $sub_menu_data['capability'],
+                $sub_menu_data['menu_slug'],
+                $sub_menu_data['function']
             );
         }
     }
@@ -105,12 +133,14 @@ class WPSettingsBuilder
      *
      * array(
      *      array(
-     *          'slug'              => '',
-     *          'title'             => '',
-     *          'callbackClass'     => '',
-     *          'callbackMethod'    => '',
-     *          'optionGroup'       => ''
-     *      ),
+                'id'        =>  '',
+                'title'     =>  '',
+                'callback'  =>  array(
+                    '',
+                    ''
+                ),
+                'page'      =>  '',
+            ),
      *      array(...
      *      ),
      *      array(...
@@ -123,15 +153,15 @@ class WPSettingsBuilder
      */
     public function addAdminSections()
     {
-        foreach ($this->_sectionData as $value) {
+        foreach ($this->_sectionData as $section_data) {
             add_settings_section(
-                $value['slug'],
-                $value['title'],
+                $section_data['id'],
+                $section_data['title'],
                 array(
-                     $value['callbackClass'],
-                     $value['callbackMethod']
+                     $section_data['callback_class'],
+                     $section_data['callback_method']
                 ),
-                $value['optionGroup']
+                $section_data['page']
             );
         }
     }
@@ -165,80 +195,81 @@ class WPSettingsBuilder
      */
     public function addAdminFields()
     {
-        foreach ($this->_fieldData as $value ) {
+        foreach ($this->_fieldData as $field_data ) {
             add_settings_field(
-                $value['slug'],
-                $value['title'],
+                $field_data['id'],
+                $field_data['title'],
                 array(
-                     $value['callbackClass'],
-                     $value['callbackMethod']
+                     $field_data['callback_class'],
+                     $field_data['callback_method']
                 ),
-                $value['optionGroup'],
-                $value['section'],
-                $value
+                $field_data['page'],
+                $field_data['section'],
+                $field_data['args']
             );
             register_setting(
-                $value['optionGroup'],
-                $value['slug']
+                $field_data['option_group'],
+                $field_data['option_name'],
+                $field_data['sanitize_callback']
             );
         }
     }
 
     public function addCustomPostType()
     {
-        foreach ( $this->_cptData as $cpt ) {
+        foreach ( $this->_cptData as $cpt_data ) {
             $labels = array(
                 'name'
-                => _x($cpt['post_type_singular'], 'post type general name'),
+                => _x($cpt_data['post_type_singular'], 'post type general name'),
                 'singular_name'
-                => _x($cpt['post_type_singular'], 'post type singular name'),
+                => _x($cpt_data['post_type_singular'], 'post type singular name'),
                 'add_new'
-                => _x('Add New', $cpt['post_type_singular']),
+                => _x('Add New', $cpt_data['post_type_singular']),
                 'add_new_item'
-                => __('Add New ' . $cpt['post_type_singular']),
+                => __('Add New ' . $cpt_data['post_type_singular']),
                 'edit_item'
-                => __('Edit ' . $cpt['post_type_singular']),
+                => __('Edit ' . $cpt_data['post_type_singular']),
                 'new_items'
-                => __('New ' . $cpt['post_type_singular']),
+                => __('New ' . $cpt_data['post_type_singular']),
                 'all_items'
-                => __('All ' . $cpt['post_type_plural']),
+                => __('All ' . $cpt_data['post_type_plural']),
                 'view_item'
-                => __('View ' . $cpt['post_type_plural']),
+                => __('View ' . $cpt_data['post_type_plural']),
                 'search_items'
-                => __('Search ' . $cpt['post_type_plural']),
+                => __('Search ' . $cpt_data['post_type_plural']),
                 'not_found'
-                => __('No ' . $cpt['post_type_plural'] . ' found'),
+                => __('No ' . $cpt_data['post_type_plural'] . ' found'),
                 'not_found_in_trash'
-                => __('No ' . $cpt['post_type_plural'] . ' found in the trash'),
+                => __('No ' . $cpt_data['post_type_plural'] . ' found in the trash'),
                 'parent_item_colon'
                 => '',
                 'menu_name'
-                => $cpt['post_type_plural']
+                => $cpt_data['post_type_plural']
             );
-            $cpt['cpt_args']['label'] = $cpt['post_type_plural'];
-            $cpt['cpt_args']['labels'] = $labels;
-            register_post_type($cpt['post_type'], $cpt['cpt_args']);
+            $cpt_data['cpt_args']['label'] = $cpt_data['post_type_plural'];
+            $cpt_data['cpt_args']['labels'] = $labels;
+            register_post_type($cpt_data['post_type'], $cpt_data['cpt_args']);
         }
     }
 
     public function addCustomTaxonomy()
     {
-        foreach ( $this->_taxData as $tax ) {
+        foreach ( $this->_taxData as $taxonomy_data ) {
             $labels = array(
-                'name'              => _x($tax['plural_tax_name'], 'taxonomy general name'),
-                'singular_name'     => _x($tax['singular_tax_name'], 'taxonomy singular name'),
-                'search_items'      => __('Search ' . $tax['plural_tax_name']),
-                'all_items'         => __('All ' . $tax['plural_tax_name']),
-                'parent_item'       => __('Parent ' . $tax['singular_tax_name']),
-                'parent_item_colon' => __('Parent ' . $tax['singular_tax_name'] . ':'),
-                'edit_item'         => __('Edit ' . $tax['singular_tax_name']),
-                'update_item'       => __('Update ' . $tax['singular_tax_name']),
-                'add_new_item'      => __('Add New ' . $tax['singular_tax_name']),
-                'new_item_name'     => __('New ' . $tax['singular_tax_name'] . ' Name'),
-                'menu_name'         => __($tax['plural_tax_name']),
+                'name'              => _x($taxonomy_data['plural_tax_name'], 'taxonomy general name'),
+                'singular_name'     => _x($taxonomy_data['singular_tax_name'], 'taxonomy singular name'),
+                'search_items'      => __('Search ' . $taxonomy_data['plural_tax_name']),
+                'all_items'         => __('All ' . $taxonomy_data['plural_tax_name']),
+                'parent_item'       => __('Parent ' . $taxonomy_data['singular_tax_name']),
+                'parent_item_colon' => __('Parent ' . $taxonomy_data['singular_tax_name'] . ':'),
+                'edit_item'         => __('Edit ' . $taxonomy_data['singular_tax_name']),
+                'update_item'       => __('Update ' . $taxonomy_data['singular_tax_name']),
+                'add_new_item'      => __('Add New ' . $taxonomy_data['singular_tax_name']),
+                'new_item_name'     => __('New ' . $taxonomy_data['singular_tax_name'] . ' Name'),
+                'menu_name'         => __($taxonomy_data['plural_tax_name']),
             );
-            $tax['tax_args']['labels'] = $labels;
-            register_taxonomy($tax['tax_type'], $tax['for_post_type_of'], $tax['tax_args']);
+            $taxonomy_data['tax_args']['labels'] = $labels;
+            register_taxonomy($taxonomy_data['tax_type'], $taxonomy_data['for_post_type_of'], $taxonomy_data['tax_args']);
         }
 
     }
