@@ -24,6 +24,11 @@ class WPSettingsBuilder_Data
 
     }
 
+    /**
+     * TODO: descrption for menu
+     *
+     * @return array
+     */
     public static function menu()
     {
         return array(
@@ -43,6 +48,11 @@ class WPSettingsBuilder_Data
         );
     }
 
+    /**
+     * TODO: descrption for subMenu
+     *
+     * @return array
+     */
     public static  function subMenu()
     {
         return array(
@@ -62,6 +72,11 @@ class WPSettingsBuilder_Data
         );
     }
 
+    /**
+     * TODO: descrption for section
+     *
+     * @return array
+     */
     public static function section()
     {
         return array(
@@ -79,16 +94,49 @@ class WPSettingsBuilder_Data
         );
     }
 
+    /**
+     * TODO: descrption for fields
+     *
+     * @return array
+     */
     public static function fields()
     {
-        return array();
+        return array(
+            array(
+                'id'                =>  '',
+                'title'             =>  '',
+                'callback'          =>  array(
+                    '',
+                    ''
+                ),
+                'page'              =>  '',
+                'section'           =>  '',
+                'args'              =>  '',
+                'option_group'      =>  '',
+                'option_name'       =>  '',
+                'sanitize_callback' =>  array(
+                    '',
+                    ''
+                )
+            ),
+        );
     }
 
+    /**
+     * TODO: descrption for customPostTypes
+     *
+     * @return array
+     */
     public static function customPostTypes()
     {
         return array();
     }
 
+    /**
+     * TODO: descrption for taxonomy
+     *
+     * @return array
+     */
     public static  function taxonomy()
     {
         return array();

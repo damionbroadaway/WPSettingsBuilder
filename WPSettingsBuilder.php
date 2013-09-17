@@ -199,10 +199,7 @@ class WPSettingsBuilder
             add_settings_field(
                 $field_data['id'],
                 $field_data['title'],
-                array(
-                     $field_data['callback_class'],
-                     $field_data['callback_method']
-                ),
+                $field_data['callback'],
                 $field_data['page'],
                 $field_data['section'],
                 $field_data['args']
